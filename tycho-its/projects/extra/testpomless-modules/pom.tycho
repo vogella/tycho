@@ -1,0 +1,6 @@
+# The modules of this build, one per line.
+# Modules can be commented out without touching the pom.xml.
+targetplatform
+bundle1.tests
+feature
+#disabled.bundle

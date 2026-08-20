@@ -34,6 +34,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>io.takari.polyglot</groupId>
+			<artifactId>polyglot-common</artifactId>
+			<version>0.8.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.tycho</groupId>
 			<artifactId>tycho-buildtimestamp-jgit</artifactId>
 			<version>${project.version}</version>
@@ -116,6 +121,11 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-testing</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

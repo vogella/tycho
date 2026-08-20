@@ -6,6 +6,21 @@ If you are reading this in the browser, then you can quickly jump to specific ve
 
 ## 6.0.0 (under development)
 
+### module list of a `pom.xml` can be maintained in a `pom.tycho` file
+
+A directory that contains a `pom.xml` can now list additional modules in a `pom.tycho` file next to it, one module per line.
+Blank lines and lines starting with `#` are ignored, so modules can be enabled and disabled without touching any XML.
+
+```
+# the modules of this build
+bundles/bundle1
+../submodule-a/bundle2
+#temporarily.disabled.bundle
+```
+
+Previously such a file was only used for directories without a `pom.xml`.
+This allows to keep a regular parent POM with all its configuration while the module list lives outside of it, which helps for projects whose modules do not follow a structured layout, for example because they come from Git submodules.
+
 ### new `tycho-p2-extras:p2-manager` mojo for managing P2 update sites
 
 The new `tycho-p2-extras:p2-manager` goal provides a convenient way to maintain, update, and manage the integrity of public update sites. This mojo wraps the [P2 Manager application from JustJ Tools](https://eclipse.dev/justj/?page=tools) and makes it much easier to use compared to the previous approach using the eclipse-run goal.

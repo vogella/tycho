@@ -58,6 +58,18 @@ public class TychoPomlessITest extends AbstractTychoIntegrationTest {
 	}
 
 	@Test
+	public void testModulesFromModuleListFile() throws Exception {
+		// the pom.xml declares only bundle1, the other modules come from pom.tycho
+		Verifier verifier = getVerifier("extra/testpomless-modules", false);
+		verifier.executeGoals(asList("clean", "verify"));
+		verifier.verifyErrorFreeLog();
+		File baseDir = new File(verifier.getBasedir());
+		assertThat(new File(baseDir, "bundle1/target/pomless.bundle-0.1.0-SNAPSHOT.jar"), isFile());
+		assertThat(new File(baseDir, "bundle1.tests/target/pomless.bundle.tests-1.0.1.jar"), isFile());
+		assertThat(new File(baseDir, "feature/target/pomless.feature-1.0.0-SNAPSHOT.jar"), isFile());
+	}
+
+	@Test
 	public void testPomlessStructuredBuildExtension() throws Exception {
 		Verifier verifier = getVerifier("extra/testpomless-structured", false);
 		verifier.executeGoals(asList("clean", "verify"));

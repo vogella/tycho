@@ -88,3 +88,19 @@ Tycho however can derive most of the information from other already existing fil
 ```
 
 - You can now run your build with `mvn verify`.
+
+## Keeping the module list in a separate file
+
+The modules of a directory can be listed in a plain text file called `pom.tycho`, one module per line.
+Blank lines and lines starting with `#` are ignored, so modules can be commented out without touching any XML:
+
+```
+# the modules of this build
+bundles/bundle1
+../submodule-a/bundle2
+#temporarily.disabled.bundle
+```
+
+If the directory has no `pom.xml`, Tycho derives a complete aggregator POM from that file, using the directory name as artifact id.
+If the directory has a `pom.xml`, the listed modules are added to the modules declared in it.
+This keeps a regular parent POM with all its configuration while the module list itself lives outside of it, which is useful when the modules do not follow a structured layout, for example because they come from Git submodules.

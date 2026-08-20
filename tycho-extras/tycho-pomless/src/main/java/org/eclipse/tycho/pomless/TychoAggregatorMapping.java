@@ -21,9 +21,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -43,7 +44,7 @@ public class TychoAggregatorMapping extends AbstractTychoMapping {
     private static final String TYCHO_AUTOMATIC_GENERATED_FILE_HEADER = TYCHO_AUTOMATIC_GENERATED_FILE_HEADER_PREFIX
             + " " + UUID.randomUUID().toString();
 
-    private static final String TYCHO_POM = "pom.tycho";
+    public static final String TYCHO_POM = "pom.tycho";
 
     private static final Set<String> COMMON_NAMES = Set.of(System.getProperty(TYCHO_POMLESS_AGGREGATOR_NAMES_PROPERTY,
             "bundles,plugins,tests,features,sites,products,releng").split(","));
@@ -103,15 +104,33 @@ public class TychoAggregatorMapping extends AbstractTychoMapping {
     @Override
     protected void initModel(Model model, Reader artifactReader, Path artifactFile) throws IOException {
         logger.debug("Generate aggregator pom for " + artifactFile);
-        try (BufferedReader reader = new BufferedReader(artifactReader)) {
-            Stream<String> lines = reader.lines().filter(l -> !l.startsWith("#") && !l.isBlank()).map(String::strip);
-            for (Iterator<String> iterator = lines.iterator(); iterator.hasNext();) {
-                String line = iterator.next();
-                logger.debug("Adding module " + line);
-                model.getModules().add(line);
-            }
-            model.setArtifactId(getFileName(artifactFile.getParent()));
-            model.setName("[aggregator] " + model.getArtifactId());
+        for (String module : readModules(artifactReader)) {
+            logger.debug("Adding module " + module);
+            model.getModules().add(module);
+        }
+        model.setArtifactId(getFileName(artifactFile.getParent()));
+        model.setName("[aggregator] " + model.getArtifactId());
+    }
+
+    /**
+     * Reads the modules of a {@value #TYCHO_POM} file, ignoring blank lines and comments.
+     */
+    public static List<String> readModules(Reader moduleList) throws IOException {
+        try (BufferedReader reader = new BufferedReader(moduleList)) {
+            return reader.lines().filter(l -> !l.startsWith("#") && !l.isBlank()).map(String::strip).toList();
+        }
+    }
+
+    /**
+     * Returns whether the given {@value #TYCHO_POM} file was written by Tycho itself instead of by
+     * the user.
+     */
+    public static boolean isGenerated(Path moduleList) {
+        try (var lines = Files.lines(moduleList, StandardCharsets.UTF_8)) {
+            return lines.findFirst().filter(l -> l.startsWith(TYCHO_AUTOMATIC_GENERATED_FILE_HEADER_PREFIX))
+                    .isPresent();
+        } catch (IOException e) {
+            return false;
         }
     }
 
